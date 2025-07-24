@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "nodemon index",
     "start": "node index"
+    
   },
   "keywords": [],
   "author": "",
