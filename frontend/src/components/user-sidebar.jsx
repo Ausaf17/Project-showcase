@@ -30,19 +30,19 @@ import {
 const navItems = [
   {
     title: "Profile",
-    url: "/profile",
+    url: "/user/profile",
     icon: User,
     description: "View and edit your profile",
   },
   {
     title: "Projects",
-    url: "/projects",
+    url: "/user/myprojects",
     icon: FolderOpen,
     description: "Manage your academic projects",
   },
   {
     title: "Contributions",
-    url: "/contributions",
+    url: "/user/contributions",
     icon: BarChart3,
     description: "Track your contributions and activity",
   },

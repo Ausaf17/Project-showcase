@@ -8,6 +8,7 @@ import { ProjectCard } from "@/components/project-card"
 import { Search, TrendingUp, Users, FolderOpen, Award, ArrowRight, Filter, GraduationCap } from "lucide-react"
 import React, { useEffect, useState } from "react"
 import axios from "axios"
+import Link from "next/link"
 
 // Sample data
 const featuredProjects = [
@@ -228,11 +229,13 @@ export default function HomePage() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {categories.map((category) => (
-              <Card key={category} className="cursor-pointer hover:shadow-md transition-shadow">
-                <CardContent className="p-6 text-center">
-                  <div className="text-sm font-medium">{category}</div>
-                </CardContent>
-              </Card>
+              <Link key={category} href={`/browse-project?category=${encodeURIComponent(category)}`} passHref legacyBehavior>
+                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                  <CardContent className="p-6 text-center">
+                    <div className="text-sm font-medium">{category}</div>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
         </div>

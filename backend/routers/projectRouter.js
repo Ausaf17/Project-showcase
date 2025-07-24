@@ -85,6 +85,30 @@ router.get('/getbytitle/:title',(req,res)=>{
     });
 });
 
+// get projects by creator
+router.get('/getbycreator/:creatorId', (req, res) => {
+    Model.find({ creator: req.params.creatorId })
+      .populate('contributors')
+      .populate('creator', 'name email')
+      .then((result) => {
+        res.status(200).json(result);
+      }).catch((err) => {
+        res.status(500).json(err);
+      });
+});
+
+// get projects by contributor
+router.get('/getbycontributor/:userId', (req, res) => {
+    Model.find({ contributors: req.params.userId })
+      .populate('contributors')
+      .populate('creator', 'name email')
+      .then((result) => {
+        res.status(200).json(result);
+      }).catch((err) => {
+        res.status(500).json(err);
+      });
+});
+
 // update
 router.put('/update/:id',(req,res)=>{
     Model.findByIdAndUpdate(req.params.id, req.body, { new: true })
