@@ -9,6 +9,7 @@ const port = process.env.PORT || 5000;
 
 // CORS configuration: allow only origins specified in .env ALLOWED_ORIGINS
 const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [];
+console.log('Registering CORS middleware');
 app.use(cors({
     origin: function (origin, callback) {
         if (origin && allowedOrigins.includes(origin)) {
@@ -19,24 +20,25 @@ app.use(cors({
     },
 }));
 
-// Handle preflight OPTIONS requests for all routes
-app.options('*', cors());
-
+console.log('Registering express.json middleware');
 app.use(express.json());
 
+console.log('Registering /user route');
 app.use('/user', UserRouter);
+console.log('Registering /project route');
 app.use('/project', ProjectRouter);
 
-// Global error handler (should be after all routes)
+console.log('Registering global error handler');
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ message: 'Internal Server Error' });
 });
 
 // To serve static files in production, uncomment and use:
+// console.log('Registering static file serving for /public');
 // app.use(express.static('public'));
 
-// following tell me server is started
+console.log('Starting server on port', port);
 app.listen(port, () => {
     console.log('server started');
 });
