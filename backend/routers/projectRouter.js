@@ -109,6 +109,20 @@ router.get('/getbycontributor/:userId', (req, res) => {
       });
 });
 
+// Dashboard stats endpoint
+router.get('/stats', async (req, res) => {
+  try {
+    const totalProjects = await Model.countDocuments({ isApproved: true });
+    const categories = await Model.distinct('categories', { isApproved: true });
+    res.json({
+      totalProjects,
+      categoriesCount: categories.length
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch stats' });
+  }
+});
+
 // update
 router.put('/update/:id',(req,res)=>{
     Model.findByIdAndUpdate(req.params.id, req.body, { new: true })
