@@ -19,7 +19,7 @@ const MyProjectsPage = () => {
       return;
     }
     setLoading(true);
-    fetch(`http://localhost:5000/project/getbycreator/${userId}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/project/getbycreator/${userId}`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch projects');
         return res.json();
@@ -43,7 +43,7 @@ const MyProjectsPage = () => {
     if (!window.confirm('Are you sure you want to delete this project?')) return;
     setDeletingId(id);
     try {
-      const res = await fetch(`http://localhost:5000/project/delete/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/project/delete/${id}`, {
         method: 'DELETE',
       });
       if (!res.ok) throw new Error('Failed to delete project');

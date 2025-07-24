@@ -17,7 +17,7 @@ const ContributionsPage = () => {
       return;
     }
     setLoading(true);
-    fetch(`http://localhost:5000/project/getbycontributor/${userId}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/project/getbycontributor/${userId}`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch contributions');
         return res.json();
