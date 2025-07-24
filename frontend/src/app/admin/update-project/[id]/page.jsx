@@ -19,7 +19,7 @@ export default function UpdateProject({ params }) {
   });
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/project/getbyid/${id}`)
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/project/getbyid/${id}`)
       .then(res => {
         const data = res.data;
         setProject(data);
@@ -51,7 +51,7 @@ export default function UpdateProject({ params }) {
   const handleSubmit = async e => {
     e.preventDefault();
     try {
-      const res = await fetch(`http://localhost:5000/project/update/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/project/update/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),

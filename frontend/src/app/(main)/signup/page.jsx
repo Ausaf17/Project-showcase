@@ -32,7 +32,7 @@ const Signup = () => {
       await validationSchema.validate(formData, { abortEarly: false })
       setErrors({})
       // Send data to the backend
-      const response = await axios.post("http://localhost:5000/user/add", formData)
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/user/add`, formData)
       toast.success("User registered successfully!")
       console.log("Response:", response.data)
     } catch (validationErrors) {

@@ -21,7 +21,7 @@ export default function UpdateUserPage() {
   useEffect(() => {
     if (!userId) return;
     setLoading(true);
-    fetch(`http://localhost:5000/user/getbyid/${userId}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/getbyid/${userId}`)
       .then((res) => res.json())
       .then((data) => {
         setUser(data);
@@ -49,7 +49,7 @@ export default function UpdateUserPage() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(`http://localhost:5000/user/update/${userId}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/update/${userId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

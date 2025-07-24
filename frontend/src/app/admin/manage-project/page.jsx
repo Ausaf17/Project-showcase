@@ -2,7 +2,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-const API_URL = 'http://localhost:5000/project'; // Adjust if needed
+const API_URL = process.env.NEXT_PUBLIC_API_URL + '/project'; // Adjust if needed
 
 export default function ManageProject() {
   const [projects, setProjects] = useState([]);

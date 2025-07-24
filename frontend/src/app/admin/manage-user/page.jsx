@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Users, Pencil, Trash2, Loader2 } from 'lucide-react';
 
-const API_URL = 'http://localhost:5000/user';
+const API_URL = process.env.NEXT_PUBLIC_API_URL + '/user';
 
 const ManageUser = () => {
   const [users, setUsers] = useState([]);
