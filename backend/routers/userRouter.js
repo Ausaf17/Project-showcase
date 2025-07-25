@@ -118,4 +118,14 @@ router.get('/search', async (req, res) => {
   }
 });
 
+// Dashboard stats endpoint
+router.get('/stats', async (req, res) => {
+  try {
+    const activeStudents = await Model.countDocuments({ role: 'user' });
+    res.json({ activeStudents });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch stats' });
+  }
+});
+
 module.exports = router;

@@ -80,16 +80,12 @@ const categories = [
   "Design",
 ]
 
-const stats = [
-  { label: "Total Projects", value: "2,847", icon: FolderOpen },
-  { label: "Active Students", value: "1,234", icon: Users },
-  { label: "Categories", value: "25", icon: Award },
-  { label: "Monthly Views", value: "45.2K", icon: TrendingUp },
-]
-
 export default function HomePage() {
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
+  // Add state for dashboard stats
+  const [stats, setStats] = useState({ totalProjects: 0, activeStudents: 0, categoriesCount: 0 });
+  const [statsLoading, setStatsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchProjects() {
@@ -104,6 +100,28 @@ export default function HomePage() {
     }
     fetchProjects()
   }, [])
+
+  // Fetch dashboard stats
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const [projectRes, userRes] = await Promise.all([
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/project/stats`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/user/stats`)
+        ]);
+        setStats({
+          totalProjects: projectRes.data.totalProjects,
+          categoriesCount: projectRes.data.categoriesCount,
+          activeStudents: userRes.data.activeStudents
+        });
+      } catch (error) {
+        // Optionally handle error
+      } finally {
+        setStatsLoading(false);
+      }
+    }
+    fetchStats();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -155,15 +173,28 @@ export default function HomePage() {
       <section className="py-16 px-4 border-b">
         <div className="container mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <Card key={index} className="text-center">
-                <CardContent className="pt-6">
-                  <stat.icon className="h-8 w-8 mx-auto mb-2 text-primary" />
-                  <div className="text-2xl font-bold mb-1">{stat.value}</div>
-                  <div className="text-sm text-muted-foreground">{stat.label}</div>
-                </CardContent>
-              </Card>
-            ))}
+            <Card className="text-center">
+              <CardContent className="pt-6">
+                <FolderOpen className="h-8 w-8 mx-auto mb-2 text-primary" />
+                <div className="text-2xl font-bold mb-1">{statsLoading ? '...' : stats.totalProjects}</div>
+                <div className="text-sm text-muted-foreground">Total Projects</div>
+              </CardContent>
+            </Card>
+            <Card className="text-center">
+              <CardContent className="pt-6">
+                <Users className="h-8 w-8 mx-auto mb-2 text-primary" />
+                <div className="text-2xl font-bold mb-1">{statsLoading ? '...' : stats.activeStudents}</div>
+                <div className="text-sm text-muted-foreground">Active Students</div>
+              </CardContent>
+            </Card>
+            <Card className="text-center">
+              <CardContent className="pt-6">
+                <Award className="h-8 w-8 mx-auto mb-2 text-primary" />
+                <div className="text-2xl font-bold mb-1">{statsLoading ? '...' : stats.categoriesCount}</div>
+                <div className="text-sm text-muted-foreground">Categories</div>
+              </CardContent>
+            </Card>
+            {/* Monthly Views card removed */}
           </div>
         </div>
       </section>
