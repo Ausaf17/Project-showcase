@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, Grid3X3, List, Users, BookOpen, TrendingUp, RefreshCw, X } from "lucide-react"
+import { Search, Grid3X3, List, Users, BookOpen, TrendingUp, RefreshCw, X, Filter, Sparkles, GraduationCap } from "lucide-react"
 import { useSearchParams } from "next/navigation"
 
 const categories = [
@@ -98,43 +98,38 @@ export default function BrowseProjectContent() {
 		// Apply filters
 		if (categoryFilter !== "all") {
 			filtered = filtered.filter((project) => {
-				if (Array.isArray(project.categories)) {
-					return project.categories.includes(categoryFilter)
-				}
-				if (project.category) {
-					return project.category === categoryFilter
-				}
-				if (project.department) {
-					return project.department === categoryFilter
-				}
-				return false
+				return project.categories && project.categories.includes(categoryFilter)
 			})
 		}
+
 		if (statusFilter !== "all") {
 			filtered = filtered.filter((project) => project.status === statusFilter)
 		}
+
 		if (yearFilter !== "all") {
 			filtered = filtered.filter((project) => project.academicYear === yearFilter)
 		}
 
 		// Apply sorting
-		filtered.sort((a, b) => {
-			switch (sortBy) {
-				case "newest":
-					return new Date(b.createdAt || "").getTime() - new Date(a.createdAt || "").getTime()
-				case "oldest":
-					return new Date(a.createdAt || "").getTime() - new Date(b.createdAt || "").getTime()
-				case "title-asc":
-					return a.title.localeCompare(b.title)
-				case "title-desc":
-					return b.title.localeCompare(a.title)
-				default:
-					return 0
-			}
-		})
+		switch (sortBy) {
+			case "newest":
+				filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+				break
+			case "oldest":
+				filtered.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+				break
+			case "title-asc":
+				filtered.sort((a, b) => a.title.localeCompare(b.title))
+				break
+			case "title-desc":
+				filtered.sort((a, b) => b.title.localeCompare(a.title))
+				break
+			default:
+				break
+		}
 
 		setFilteredProjects(filtered)
-	}, [searchQuery, categoryFilter, statusFilter, yearFilter, sortBy, projectList])
+	}, [projectList, searchQuery, categoryFilter, statusFilter, yearFilter, sortBy])
 
 	const clearAllFilters = () => {
 		setSearchQuery("")
@@ -144,79 +139,90 @@ export default function BrowseProjectContent() {
 	}
 
 	const removeFilter = (filterText) => {
-		if (filterText.startsWith("Search:")) setSearchQuery("")
-		else if (filterText.startsWith("Category:")) setCategoryFilter("all")
-		else if (filterText.startsWith("Status:")) setStatusFilter("all")
-		else if (filterText.startsWith("Year:")) setYearFilter("all")
+		if (filterText.startsWith("Search:")) {
+			setSearchQuery("")
+		} else if (filterText.startsWith("Category:")) {
+			setCategoryFilter("all")
+		} else if (filterText.startsWith("Status:")) {
+			setStatusFilter("all")
+		} else if (filterText.startsWith("Year:")) {
+			setYearFilter("all")
+		}
 	}
 
 	const getStatusStats = () => {
-		const stats = statuses.map((status) => ({
-			status,
-			count: projectList.filter((p) => p.status === status).length,
-		}))
-		return stats
+		const stats = {}
+		projectList.forEach((project) => {
+			stats[project.status] = (stats[project.status] || 0) + 1
+		})
+		return Object.entries(stats).map(([status, count]) => ({ status, count }))
 	}
 
 	const getCategoryStats = () => {
-		const stats = categories
-			.map((cat) => ({
-				category: cat,
-				count: projectList.filter((p) => p.department === cat).length,
-			}))
-			.filter((stat) => stat.count > 0)
-		return stats
+		const stats = {}
+		projectList.forEach((project) => {
+			if (project.categories) {
+				project.categories.forEach((category) => {
+					stats[category] = (stats[category] || 0) + 1
+				})
+			}
+		})
+		return Object.entries(stats)
+			.map(([category, count]) => ({ category, count }))
+			.sort((a, b) => b.count - a.count)
 	}
 
 	return (
-		<div className="min-h-screen bg-background">
-			{/* Enhanced Header */}
-			<header className="bg-gradient-to-r from-primary via-primary/90 to-secondary py-12 shadow-lg">
-				<div className="max-w-7xl mx-auto px-6">
-					<div className="text-center text-primary-foreground">
-						<h1 className="text-4xl md:text-6xl font-bold mb-4">Explore Projects</h1>
-						<p className="text-xl md:text-2xl opacity-90 mb-6 max-w-3xl mx-auto">
-							Discover innovative projects from talented students across all engineering departments
-						</p>
-						<div className="flex flex-wrap justify-center gap-4 text-sm">
-							<div className="flex items-center gap-2">
-								<BookOpen className="h-4 w-4" />
-								<span>{projectList.length} Projects</span>
-							</div>
-							<div className="flex items-center gap-2">
-								<Users className="h-4 w-4" />
-								<span>{categories.length} Categories</span>
-							</div>
-							<div className="flex items-center gap-2">
-								<TrendingUp className="h-4 w-4" />
-								<span>Updated Daily</span>
+		<div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
+			{/* Background Decorations */}
+			<div className="absolute inset-0">
+				<div className="absolute top-20 left-10 w-72 h-72 bg-blue-400/10 rounded-full blur-3xl"></div>
+				<div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-400/10 rounded-full blur-3xl"></div>
+				<div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-indigo-400/5 rounded-full blur-3xl"></div>
+			</div>
+
+			<main className="relative z-10 container mx-auto px-4 py-8 sm:py-12">
+				{/* Header Section */}
+				<div className="text-center mb-8 sm:mb-12">
+					<div className="flex items-center justify-center space-x-3 mb-6">
+						<div className="relative">
+							<div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl blur opacity-30"></div>
+							<div className="relative bg-gradient-to-r from-blue-600 to-purple-600 p-3 rounded-xl shadow-lg">
+								<BookOpen className="h-8 w-8 text-white" />
 							</div>
 						</div>
+						<span className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+							ProjectHub
+						</span>
 					</div>
+					<h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+						Browse Projects
+					</h1>
+					<p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
+						Discover innovative projects from talented students across different fields and technologies
+					</p>
 				</div>
-			</header>
 
-			<main className="max-w-7xl mx-auto px-6 py-8">
 				{/* Search and Filter Section */}
-				<Card className="mb-8">
-					<CardContent className="p-6">
+				<Card className="mb-8 bg-white/80 backdrop-blur-sm border border-white/20 shadow-2xl rounded-2xl overflow-hidden">
+					<CardContent className="p-6 sm:p-8">
 						<div className="space-y-6">
 							{/* Search Bar */}
 							<div className="relative">
-								<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+								<Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
 								<Input
 									type="text"
 									placeholder="Search projects, contributors, technologies..."
 									value={searchQuery}
 									onChange={(e) => setSearchQuery(e.target.value)}
-									className="pl-10 h-12 text-base"
+									className="pl-12 h-12 text-base bg-white/60 backdrop-blur-sm border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
 								/>
 							</div>
 
 							{/* Filters Row */}
-							<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 								<Select value={categoryFilter} onValueChange={setCategoryFilter}>
-									<SelectTrigger>
+									<SelectTrigger className="bg-white/60 backdrop-blur-sm border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300">
 										<SelectValue placeholder="All Categories" />
 									</SelectTrigger>
 									<SelectContent>
@@ -230,7 +236,7 @@ export default function BrowseProjectContent() {
 								</Select>
 
 								<Select value={statusFilter} onValueChange={setStatusFilter}>
-									<SelectTrigger>
+									<SelectTrigger className="bg-white/60 backdrop-blur-sm border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300">
 										<SelectValue placeholder="All Statuses" />
 									</SelectTrigger>
 									<SelectContent>
@@ -244,7 +250,7 @@ export default function BrowseProjectContent() {
 								</Select>
 
 								<Select value={yearFilter} onValueChange={setYearFilter}>
-									<SelectTrigger>
+									<SelectTrigger className="bg-white/60 backdrop-blur-sm border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300">
 										<SelectValue placeholder="All Years" />
 									</SelectTrigger>
 									<SelectContent>
@@ -258,7 +264,7 @@ export default function BrowseProjectContent() {
 								</Select>
 
 								<Select value={sortBy} onValueChange={setSortBy}>
-									<SelectTrigger>
+									<SelectTrigger className="bg-white/60 backdrop-blur-sm border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300">
 										<SelectValue placeholder="Sort by" />
 									</SelectTrigger>
 									<SelectContent>
@@ -273,12 +279,12 @@ export default function BrowseProjectContent() {
 							{/* Active Filters */}
 							{activeFilters.length > 0 && (
 								<div className="flex flex-wrap gap-2 items-center">
-									<span className="text-sm text-muted-foreground">Active filters:</span>
+									<span className="text-sm text-gray-600 font-medium">Active filters:</span>
 									{activeFilters.map((filter, index) => (
 										<Badge
 											key={index}
 											variant="secondary"
-											className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground"
+											className="cursor-pointer hover:bg-red-100 hover:text-red-700 transition-all duration-300 bg-white/60 backdrop-blur-sm border border-gray-200"
 											onClick={() => removeFilter(filter)}
 										>
 											{filter}
@@ -289,7 +295,7 @@ export default function BrowseProjectContent() {
 										variant="ghost"
 										size="sm"
 										onClick={clearAllFilters}
-										className="text-muted-foreground hover:text-foreground"
+										className="text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-all duration-300"
 									>
 										Clear all
 									</Button>
@@ -300,28 +306,34 @@ export default function BrowseProjectContent() {
 				</Card>
 
 				{/* Results Header */}
-				<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+				<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
 					<div>
-						<h2 className="text-2xl font-semibold">
+						<h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text text-transparent">
 							{filteredProjects.length} Project{filteredProjects.length !== 1 ? "s" : ""} Found
 						</h2>
-						<p className="text-muted-foreground">
+						<p className="text-gray-600 text-sm sm:text-base">
 							{activeFilters.length > 0 ? "Filtered results" : "Showing all projects"}
 						</p>
 					</div>
 
-					<div className="flex items-center gap-2">
-						<Button variant="ghost" size="sm" onClick={fetchProjects} disabled={isLoading}>
+					<div className="flex items-center gap-3">
+						<Button 
+							variant="outline" 
+							size="sm" 
+							onClick={fetchProjects} 
+							disabled={isLoading}
+							className="border-gray-200 hover:bg-white/80 backdrop-blur-sm transition-all duration-300"
+						>
 							<RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
 							Refresh
 						</Button>
 
-						<div className="flex items-center border rounded-md">
+						<div className="flex items-center border border-gray-200 rounded-xl overflow-hidden bg-white/60 backdrop-blur-sm">
 							<Button
 								variant={viewMode === "grid" ? "default" : "ghost"}
 								size="sm"
 								onClick={() => setViewMode("grid")}
-								className="rounded-r-none"
+								className="rounded-r-none bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
 							>
 								<Grid3X3 className="h-4 w-4" />
 							</Button>
@@ -329,7 +341,7 @@ export default function BrowseProjectContent() {
 								variant={viewMode === "list" ? "default" : "ghost"}
 								size="sm"
 								onClick={() => setViewMode("list")}
-								className="rounded-l-none"
+								className="rounded-l-none hover:bg-gray-100"
 							>
 								<List className="h-4 w-4" />
 							</Button>
@@ -341,12 +353,12 @@ export default function BrowseProjectContent() {
 				{isLoading ? (
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 						{[...Array(6)].map((_, i) => (
-							<Card key={i} className="animate-pulse">
-								<div className="aspect-video bg-muted" />
+							<Card key={i} className="animate-pulse bg-white/80 backdrop-blur-sm border border-white/20 shadow-xl rounded-2xl overflow-hidden">
+								<div className="aspect-video bg-gray-200" />
 								<CardContent className="p-4 space-y-3">
-									<div className="h-4 bg-muted rounded w-3/4" />
-									<div className="h-3 bg-muted rounded w-full" />
-									<div className="h-3 bg-muted rounded w-2/3" />
+									<div className="h-4 bg-gray-200 rounded w-3/4" />
+									<div className="h-3 bg-gray-200 rounded w-full" />
+									<div className="h-3 bg-gray-200 rounded w-2/3" />
 								</CardContent>
 							</Card>
 						))}
@@ -381,12 +393,16 @@ export default function BrowseProjectContent() {
 
 				{/* Empty State */}
 				{!isLoading && filteredProjects.length === 0 && (
-					<Card className="text-center py-12">
+					<Card className="text-center py-12 sm:py-16 bg-white/80 backdrop-blur-sm border border-white/20 shadow-2xl rounded-2xl">
 						<CardContent>
-							<BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-							<h3 className="text-xl font-semibold mb-2">No projects found</h3>
-							<p className="text-muted-foreground mb-4">Try adjusting your search criteria or filters</p>
-							<Button onClick={clearAllFilters} variant="outline">
+							<BookOpen className="h-16 w-16 mx-auto text-gray-400 mb-6" />
+							<h3 className="text-2xl font-bold text-gray-900 mb-3">No projects found</h3>
+							<p className="text-gray-600 mb-6 text-lg">Try adjusting your search criteria or filters</p>
+							<Button 
+								onClick={clearAllFilters} 
+								variant="outline"
+								className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 px-6 py-3 rounded-xl transition-all duration-300"
+							>
 								Clear all filters
 							</Button>
 						</CardContent>
@@ -395,37 +411,41 @@ export default function BrowseProjectContent() {
 
 				{/* Quick Stats */}
 				{!isLoading && projectList.length > 0 && (
-					<div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-						<Card>
-							<CardContent className="p-6">
-								<h3 className="font-semibold mb-4 flex items-center gap-2">
-									<TrendingUp className="h-4 w-4" />
+					<div className="mt-12 sm:mt-16 grid grid-cols-1 md:grid-cols-2 gap-8">
+						<Card className="bg-white/80 backdrop-blur-sm border border-white/20 shadow-2xl rounded-2xl overflow-hidden">
+							<CardContent className="p-6 sm:p-8">
+								<h3 className="font-bold text-lg mb-6 flex items-center gap-3 text-gray-900">
+									<TrendingUp className="h-5 w-5 text-blue-600" />
 									Projects by Status
 								</h3>
-								<div className="space-y-2">
+								<div className="space-y-3">
 									{getStatusStats().map((stat) => (
-										<div key={stat.status} className="flex justify-between items-center">
-											<span className="text-sm">{stat.status}</span>
-											<Badge variant="outline">{stat.count}</Badge>
+										<div key={stat.status} className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+											<span className="text-sm font-medium text-gray-700">{stat.status}</span>
+											<Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+												{stat.count}
+											</Badge>
 										</div>
 									))}
 								</div>
 							</CardContent>
 						</Card>
 
-						<Card>
-							<CardContent className="p-6">
-								<h3 className="font-semibold mb-4 flex items-center gap-2">
-									<Users className="h-4 w-4" />
+						<Card className="bg-white/80 backdrop-blur-sm border border-white/20 shadow-2xl rounded-2xl overflow-hidden">
+							<CardContent className="p-6 sm:p-8">
+								<h3 className="font-bold text-lg mb-6 flex items-center gap-3 text-gray-900">
+									<Users className="h-5 w-5 text-purple-600" />
 									Active Categories
 								</h3>
-								<div className="space-y-2">
+								<div className="space-y-3">
 									{getCategoryStats()
 										.slice(0, 5)
 										.map((stat) => (
-											<div key={stat.category} className="flex justify-between items-center">
-												<span className="text-sm truncate">{stat.category}</span>
-												<Badge variant="outline">{stat.count}</Badge>
+											<div key={stat.category} className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+												<span className="text-sm font-medium text-gray-700 truncate">{stat.category}</span>
+												<Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+													{stat.count}
+												</Badge>
 											</div>
 										))}
 								</div>

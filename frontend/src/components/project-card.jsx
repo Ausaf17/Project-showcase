@@ -42,7 +42,7 @@ export function ProjectCard(props) {
   return (
     <Link href={`/project-detail/${_id}`}>
 
-    <Card className="group overflow-hidden transition-all hover:shadow-lg border-0 shadow-sm">
+    <Card className="group overflow-hidden transition-all hover:shadow-lg border-0 shadow-sm bg-white/80 backdrop-blur-sm">
       <CardHeader className="p-0">
         <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10">
           {thumbnailUrl ? (
@@ -54,14 +54,14 @@ export function ProjectCard(props) {
             />
           ) : (
             <div className="flex items-center justify-center h-full">
-              <FolderOpen className="h-12 w-12 text-muted-foreground" />
+              <FolderOpen className="h-8 w-8 sm:h-12 sm:w-12 text-muted-foreground" />
             </div>
           )}
-          <Badge className={`absolute top-3 right-3 text-xs ${getStatusColor(status)}`}>{status}</Badge>
+          <Badge className={`absolute top-2 sm:top-3 right-2 sm:right-3 text-xs ${getStatusColor(status)}`}>{status}</Badge>
         </div>
       </CardHeader>
 
-      <CardContent className="p-4">
+      <CardContent className="p-3 sm:p-4">
         {/* Remove department badge, show categories instead */}
         <div className="flex flex-wrap gap-1 mb-2">
           {Array.isArray(categories) && categories.length > 0 && categories.map((cat, i) => (
@@ -81,7 +81,7 @@ export function ProjectCard(props) {
           </p>
         )}
 
-        <p className="text-muted-foreground text-sm line-clamp-3 mb-3">{description || abstract}</p>
+        <p className="text-muted-foreground text-xs sm:text-sm line-clamp-3 mb-3">{description || abstract}</p>
 
         {Array.isArray(contributors) && contributors.length > 0 && (
           <div className="mb-3">
@@ -119,12 +119,12 @@ export function ProjectCard(props) {
         )}
       </CardContent>
 
-      <CardFooter className="px-4 py-3 bg-muted/30 flex items-center justify-between">
+      <CardFooter className="px-3 sm:px-4 py-2 sm:py-3 bg-muted/30 flex items-center justify-between">
         <div className="flex items-center space-x-2">
           {sourceCodeUrl && (
-            <Button variant="ghost" size="sm" asChild>
+            <Button variant="ghost" size="sm" asChild className="h-8 w-8 sm:h-9 sm:w-9 p-0">
               <a href={sourceCodeUrl} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-3 w-3" />
+                <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4" />
               </a>
             </Button>
           )}
