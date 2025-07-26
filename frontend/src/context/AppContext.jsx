@@ -8,11 +8,13 @@ const AuthProvider = ({ children }) => {
   const [authToken, setAuthToken] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
     const role = localStorage.getItem('userRole');
     const id = localStorage.getItem('userId');
+    
     if (token) {
       setAuthToken(token);
     }
@@ -22,6 +24,9 @@ const AuthProvider = ({ children }) => {
     if (id) {
       setUserId(id);
     }
+    
+    // Mark as loaded after checking localStorage
+    setIsLoaded(true);
   }, []);
 
   const logout = () => {
@@ -34,7 +39,7 @@ const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ authToken, userRole, userId, setAuthToken, setUserRole, setUserId, logout }}>
+    <AuthContext.Provider value={{ authToken, userRole, userId, isLoaded, setAuthToken, setUserRole, setUserId, logout }}>
       {children}
     </AuthContext.Provider>
   );

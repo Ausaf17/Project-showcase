@@ -143,7 +143,7 @@ export default function HomePage() {
             and connect with the next generation of creators.
           </p>
 
-          {/* Search Bar */}
+          {/* Search Bar
           <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mb-8">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -153,7 +153,7 @@ export default function HomePage() {
               <Filter className="h-4 w-4 mr-2" />
               Filter
             </Button>
-          </div>
+          </div> */}
 
           <div className="flex flex-wrap justify-center gap-2">
             {categories.slice(0, 6).map((category) => (
@@ -169,35 +169,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-16 px-4 border-b">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <Card className="text-center">
-              <CardContent className="pt-6">
-                <FolderOpen className="h-8 w-8 mx-auto mb-2 text-primary" />
-                <div className="text-2xl font-bold mb-1">{statsLoading ? '...' : stats.totalProjects}</div>
-                <div className="text-sm text-muted-foreground">Total Projects</div>
-              </CardContent>
-            </Card>
-            <Card className="text-center">
-              <CardContent className="pt-6">
-                <Users className="h-8 w-8 mx-auto mb-2 text-primary" />
-                <div className="text-2xl font-bold mb-1">{statsLoading ? '...' : stats.activeStudents}</div>
-                <div className="text-sm text-muted-foreground">Active Students</div>
-              </CardContent>
-            </Card>
-            <Card className="text-center">
-              <CardContent className="pt-6">
-                <Award className="h-8 w-8 mx-auto mb-2 text-primary" />
-                <div className="text-2xl font-bold mb-1">{statsLoading ? '...' : stats.categoriesCount}</div>
-                <div className="text-sm text-muted-foreground">Categories</div>
-              </CardContent>
-            </Card>
-            {/* Monthly Views card removed */}
-          </div>
-        </div>
-      </section>
+
 
       {/* Featured Projects */}
       <section className="py-16 px-4">
@@ -217,6 +189,53 @@ export default function HomePage() {
             {featuredProjects.map((project) => (
               <ProjectCard key={project.id} {...project} />
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-20 px-4 bg-gradient-to-r from-primary/5 via-background to-secondary/5">
+        <div className="container mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Platform Statistics</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Discover the impact of our student community and the amazing projects being shared
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <Card className="text-center border-2 border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+              <CardContent className="pt-8 pb-6">
+                <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FolderOpen className="h-8 w-8 text-primary" />
+                </div>
+                <div className="text-3xl font-bold mb-2 text-primary">{statsLoading ? '...' : stats.totalProjects}</div>
+                <div className="text-lg font-medium mb-1">Total Projects</div>
+                <div className="text-sm text-muted-foreground">Innovative student work</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="text-center border-2 border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+              <CardContent className="pt-8 pb-6">
+                <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users className="h-8 w-8 text-primary" />
+                </div>
+                <div className="text-3xl font-bold mb-2 text-primary">{statsLoading ? '...' : stats.activeStudents}</div>
+                <div className="text-lg font-medium mb-1">Active Students</div>
+                <div className="text-sm text-muted-foreground">Building the future</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="text-center border-2 border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+              <CardContent className="pt-8 pb-6">
+                <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Award className="h-8 w-8 text-primary" />
+                </div>
+                <div className="text-3xl font-bold mb-2 text-primary">{statsLoading ? '...' : stats.categoriesCount}</div>
+                <div className="text-lg font-medium mb-1">Categories</div>
+                <div className="text-sm text-muted-foreground">Diverse fields of study</div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>

@@ -25,6 +25,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import Link from "next/link"
 
 // Navigation items
 const navItems = [
@@ -61,10 +62,13 @@ export function AppSidebar({ user, ...props }) {
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                   <GraduationCap className="size-4" />
                 </div>
+                <Link href="/">
+                
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Student Portal</span>
+                  <span className="truncate font-semibold">Project Hub</span>
                   <span className="truncate text-xs text-muted-foreground">Academic Dashboard</span>
                 </div>
+                </Link>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>

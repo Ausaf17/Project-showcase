@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 
 const MyProjectsPage = () => {
-  const { userId } = useContext(AuthContext);
+  const { userId, authToken, isLoaded } = useContext(AuthContext);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -35,9 +35,16 @@ const MyProjectsPage = () => {
   };
 
   useEffect(() => {
+    // Only proceed if auth context has loaded
+    if (!isLoaded) return;
+
+    // Check if user is authenticated
+    if (!authToken || !userId) {
+      return;
+    }
+
     fetchProjects();
-    // eslint-disable-next-line
-  }, [userId]);
+  }, [userId, authToken, isLoaded]);
 
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this project?')) return;
@@ -55,9 +62,69 @@ const MyProjectsPage = () => {
     }
   };
 
-  if (!userId) return <div>Please log in to see your projects.</div>;
-  if (loading) return <div>Loading your projects...</div>;
-  if (error) return <div>Error: {error}</div>;
+  // Show loading while authentication context is being loaded
+  if (!isLoaded) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold mb-4">My Projects</h1>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if user is authenticated
+  if (!authToken || !userId) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold mb-4">My Projects</h1>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <p className="text-lg font-medium mb-2">Authentication Required</p>
+            <p className="text-muted-foreground mb-4">Please log in to see your projects.</p>
+            <Button asChild>
+              <a href="/login">Go to Login</a>
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold mb-4">My Projects</h1>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading your projects...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold mb-4">My Projects</h1>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <p className="text-lg font-medium text-destructive mb-2">Error</p>
+            <p className="text-muted-foreground mb-4">{error}</p>
+            <Button onClick={() => window.location.reload()}>
+              Try Again
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

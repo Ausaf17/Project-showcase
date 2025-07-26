@@ -40,6 +40,8 @@ export function ProjectCard(props) {
   }
 
   return (
+    <Link href={`/project-detail/${_id}`}>
+
     <Card className="group overflow-hidden transition-all hover:shadow-lg border-0 shadow-sm">
       <CardHeader className="p-0">
         <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10">
@@ -70,9 +72,9 @@ export function ProjectCard(props) {
           <span className="text-xs text-muted-foreground ml-auto">{academicYear}</span>
         </div>
 
-        <Link href={`/project-detail/${_id}`}>
+        {/* <Link href={`/project-detail/${_id}`}>
           <h3 className="font-semibold text-lg mb-2 line-clamp-2 hover:text-primary transition-colors">{title}</h3>
-        </Link>
+        </Link> */}
         {creator && (
           <p className="text-xs text-muted-foreground mb-2">
             <span className="font-semibold">Creator:</span> {creator.name || creator.email || 'Unknown'}
@@ -127,13 +129,14 @@ export function ProjectCard(props) {
             </Button>
           )}
         </div>
-        <Button variant="ghost" size="sm" asChild>
+        {/* <Button variant="ghost" size="sm" asChild>
           <Link href={`/projects/${_id}`}>
             View Details
             <ArrowRight className="h-3 w-3 ml-1" />
           </Link>
-        </Button>
+        </Button> */}
       </CardFooter>
     </Card>
+    </Link>
   )
 }

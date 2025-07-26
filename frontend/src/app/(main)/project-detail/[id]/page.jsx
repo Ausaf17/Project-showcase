@@ -11,26 +11,28 @@ import {
   Calendar,
   Users,
   Code,
-  Tag,
   ExternalLink,
   Building2,
   FileText,
   ImageIcon,
-  Loader2,
-  Star,
   Download,
   Share2,
-  Eye,
   Clock,
   Award,
+  ArrowLeft,
+  Globe,
+  Star,
+  Eye,
+  Heart,
+  MessageCircle,
 } from "lucide-react"
-
-const placeholderImg = "/placeholder.svg?height=500&width=800"
+import { toast } from "react-hot-toast"
 
 const ProjectDetail = () => {
   const { id } = useParams()
   const [project, setProject] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [copied, setCopied] = useState(false)
 
   const fetchProjectDetails = async () => {
     try {
@@ -46,18 +48,37 @@ const ProjectDetail = () => {
     if (id) fetchProjectDetails()
   }, [id])
 
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch (err) {
+      // fallback for older browsers
+      const textArea = document.createElement("textarea")
+      textArea.value = window.location.href
+      document.body.appendChild(textArea)
+      textArea.focus()
+      textArea.select()
+      try {
+        document.execCommand("copy")
+        setCopied(true)
+        setTimeout(() => setCopied(false), 1500)
+      } catch (err) {}
+      document.body.removeChild(textArea)
+    }
+  }
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4 text-slate-600">
-          <div className="relative">
-            <Loader2 className="h-12 w-12 animate-spin text-indigo-600" />
-            <div className="absolute inset-0 h-12 w-12 animate-ping rounded-full bg-indigo-200 opacity-20" />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="relative mb-6">
+            <div className="w-20 h-20 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
+            <div className="absolute inset-0 w-20 h-20 border-4 border-transparent border-t-indigo-400 rounded-full animate-spin mx-auto" style={{ animationDelay: '0.5s' }}></div>
           </div>
-          <div className="text-center">
-            <h3 className="text-lg font-semibold text-slate-900">Loading Project</h3>
-            <p className="text-sm text-slate-600">Please wait while we fetch the details...</p>
-          </div>
+          <h3 className="text-xl font-semibold text-gray-900 mb-3">Loading Project</h3>
+          <p className="text-gray-600 max-w-md">Please wait while we fetch the project details...</p>
         </div>
       </div>
     )
@@ -65,19 +86,22 @@ const ProjectDetail = () => {
 
   if (!project) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-          <CardContent className="pt-8 text-center">
-            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
-              <FileText className="h-8 w-8 text-red-600" />
-            </div>
-            <h2 className="text-xl font-bold text-slate-900 mb-2">Project Not Found</h2>
-            <p className="text-slate-600 mb-4">The project you're looking for doesn't exist or has been removed.</p>
-            <Button variant="outline" onClick={() => window.history.back()}>
-              Go Back
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-4">
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-10 text-center max-w-lg w-full border border-white/20">
+          <div className="w-20 h-20 bg-gradient-to-br from-red-100 to-red-200 rounded-full flex items-center justify-center mx-auto mb-6">
+            <FileText className="h-10 w-10 text-red-600" />
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-3">Project Not Found</h2>
+          <p className="text-gray-600 mb-8 text-lg">The project you're looking for doesn't exist or has been removed.</p>
+          <Button 
+            variant="outline" 
+            onClick={() => window.history.back()} 
+            className="w-full h-12 text-lg font-medium hover:bg-gray-50"
+          >
+            <ArrowLeft className="h-5 w-5 mr-2" />
+            Go Back
+          </Button>
+        </div>
       </div>
     )
   }
@@ -86,23 +110,31 @@ const ProjectDetail = () => {
     switch (status?.toLowerCase()) {
       case "completed":
         return {
-          color: "bg-emerald-100 text-emerald-800 border-emerald-200",
+          color: "bg-gradient-to-r from-emerald-50 to-green-50 text-emerald-700 border-emerald-200",
           icon: Award,
+          dot: "bg-emerald-500",
+          glow: "shadow-emerald-200",
         }
       case "in progress":
         return {
-          color: "bg-blue-100 text-blue-800 border-blue-200",
+          color: "bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-700 border-blue-200",
           icon: Clock,
+          dot: "bg-blue-500",
+          glow: "shadow-blue-200",
         }
       case "pending":
         return {
-          color: "bg-amber-100 text-amber-800 border-amber-200",
+          color: "bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-700 border-amber-200",
           icon: Clock,
+          dot: "bg-amber-500",
+          glow: "shadow-amber-200",
         }
       default:
         return {
-          color: "bg-slate-100 text-slate-800 border-slate-200",
+          color: "bg-gradient-to-r from-gray-50 to-slate-50 text-gray-700 border-gray-200",
           icon: FileText,
+          dot: "bg-gray-500",
+          glow: "shadow-gray-200",
         }
     }
   }
@@ -117,265 +149,315 @@ const ProjectDetail = () => {
   ].filter(Boolean)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+    <div className="min-h-screen  bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600">
-        <div className="absolute inset-0 bg-black/20" />
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/50 to-transparent" />
-
-        <div className="relative container mx-auto px-4 py-16">
-          <div className="max-w-4xl mx-auto text-center text-white">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Badge className={`${statusConfig.color} border-0`}>
-                <StatusIcon className="h-3 w-3 mr-1" />
-                {project.status}
-              </Badge>
-            </div>
-
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-              {project.title}
-            </h1>
-
-            <div className="flex flex-wrap items-center justify-center gap-6 text-white/90">
-              {project.department && (
-                <div className="flex items-center gap-2">
-                  <Building2 className="h-5 w-5" />
-                  <span>{project.department}</span>
-                </div>
-              )}
-              {project.academicYear && (
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
-                  <span>{project.academicYear}</span>
-                </div>
-              )}
-              {Array.isArray(project.contributors) && (
-                <div className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  <span>{project.contributors.length} Contributors</span>
-                </div>
-              )}
-            </div>
+      {/* <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-indigo-600/10"></div>
+        <div className="relative max-w-7xl mx-auto px-4 pt-12 pb-0">
+          <div className="flex items-center gap-4 mb-8">
+            <Button
+              variant="ghost"
+              size="lg"
+              onClick={() => window.history.back()}
+              className="text-gray-600 hover:text-gray-900 hover:bg-white/50 backdrop-blur-sm rounded-xl"
+            >
+              <ArrowLeft className="h-5 w-5 mr-2" />
+              Back
+            </Button>
+            <div className="h-6 w-px bg-gray-300"></div>
+            <Badge 
+              variant="outline" 
+              className={`${statusConfig.color} ${statusConfig.glow} font-semibold text-sm px-4 py-2 rounded-full border-2`}
+            >
+              <div className={`w-3 h-3 rounded-full ${statusConfig.dot} mr-2 animate-pulse`}></div>
+              <StatusIcon className="h-4 w-4 mr-1" />
+              {project.status}
+            </Badge>
           </div>
         </div>
-      </div>
+      </div> */}
 
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        {/* Action Buttons */}
-        <div className="flex flex-wrap gap-3 mb-8 justify-center">
-          {project.sourceCodeUrl && (
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
-            >
-              <Code className="h-4 w-4 mr-2" />
-              View Source Code
-              <ExternalLink className="h-4 w-4 ml-2" />
-            </Button>
-          )}
-          <Button variant="outline" size="lg">
-            <Share2 className="h-4 w-4 mr-2" />
-            Share Project
+      {/* Main Content Layout with Left Sidebar for Back and Status */}
+      <div className="max-w-7xl mx-auto px-4 pt-12 pb-12 flex flex-col lg:flex-row gap-8">
+        {/* Left Sidebar: Back + Status */}
+        <div className="flex flex-row lg:flex-col items-start gap-4 min-w-[160px] lg:min-w-[180px] mb-4 lg:mb-0">
+          <Button
+            variant="ghost"
+            size="lg"
+            onClick={() => window.history.back()}
+            className="text-gray-600 hover:text-gray-900 hover:bg-white/50 backdrop-blur-sm rounded-xl w-fit"
+          >
+            <ArrowLeft className="h-5 w-5 mr-2" />
+            Back
           </Button>
-          <Button variant="outline" size="lg">
-            <Download className="h-4 w-4 mr-2" />
-            Download
-          </Button>
+          <Badge 
+            variant="outline" 
+            className={`${statusConfig.color} ${statusConfig.glow} font-semibold text-sm px-4 py-2 rounded-full border-2 flex items-center gap-2`}
+          >
+            <div className={`w-3 h-3 rounded-full ${statusConfig.dot} animate-pulse`}></div>
+            <StatusIcon className="h-4 w-4" />
+            {project.status}
+          </Badge>
         </div>
-
-        <div className="grid gap-8 lg:grid-cols-3">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Image Carousel */}
-            {allImages.length > 0 && (
-              <Card className="overflow-hidden shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-                <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100">
-                  <CardTitle className="flex items-center gap-2">
-                    <ImageIcon className="h-5 w-5 text-indigo-600" />
+        {/* Main Content Area */}
+        <div className="flex-1">
+          {/* Project Gallery at Top */}
+          {allImages.length > 0 && (
+            <div className="pb-8">
+              <Card className="overflow-hidden shadow-xl rounded-2xl border-0 bg-white/80 backdrop-blur-sm">
+                <CardHeader className="pb-6 bg-gradient-to-r from-gray-50 to-blue-50">
+                  <CardTitle className="flex items-center gap-3 text-xl font-bold">
+                    <div className="p-2 bg-blue-100 rounded-lg">
+                      <ImageIcon className="h-6 w-6 text-blue-600" />
+                    </div>
                     Project Gallery
-                    <Badge variant="secondary" className="ml-auto">
+                    <Badge variant="secondary" className="ml-auto bg-blue-100 text-blue-700 font-semibold">
                       {allImages.length} {allImages.length === 1 ? "Image" : "Images"}
                     </Badge>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-6">
+                <CardContent className="p-0">
                   <ImageCarousel images={allImages} title={project.title} />
                 </CardContent>
               </Card>
-            )}
-
-            {/* Description */}
-            {project.description && (
-              <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-                <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50">
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="h-5 w-5 text-blue-600" />
-                    Project Description
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <p className="text-slate-700 leading-relaxed text-lg">{project.description}</p>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Abstract */}
-            {project.abstract && (
-              <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-                <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50">
-                  <CardTitle className="flex items-center gap-2">
-                    <Star className="h-5 w-5 text-purple-600" />
-                    Abstract
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <p className="text-slate-700 leading-relaxed text-lg">{project.abstract}</p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Project Stats */}
-            <Card className="shadow-xl border-0 bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
-              <CardContent className="p-6">
-                <h3 className="font-semibold mb-4 text-lg">Project Overview</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <Eye className="h-4 w-4" />
-                      Status
-                    </span>
-                    <Badge className="bg-white/20 text-white border-white/30">{project.status}</Badge>
-                  </div>
-                  {project.creator && (
-                    <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-2">
-                        <Users className="h-4 w-4" />
-                        Creator
-                      </span>
-                      <span className="text-sm">{project.creator.name || project.creator.email || 'Unknown'}</span>
-                    </div>
-                  )}
+            </div>
+          )}
+          {/* Main Content Grid */}
+          <div className="grid lg:grid-cols-3 gap-10">
+            {/* Left/Main Column */}
+            <div className="lg:col-span-2 space-y-8">
+              {/* Project Title & Info */}
+              <div className="mb-8">
+                <h1 className="text-5xl font-bold text-gray-900 mb-6 leading-tight bg-gradient-to-r from-gray-900 via-blue-900 to-indigo-900 bg-clip-text text-transparent">
+                  {project.title}
+                </h1>
+                <div className="flex flex-wrap items-center gap-8 text-gray-600 mb-8">
                   {project.department && (
-                    <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-2">
-                        <Building2 className="h-4 w-4" />
-                        Department
-                      </span>
-                      <span className="text-sm">{project.department}</span>
+                    <div className="flex items-center gap-3 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full">
+                      <Building2 className="h-5 w-5 text-blue-600" />
+                      <span className="font-semibold">{project.department}</span>
                     </div>
                   )}
                   {project.academicYear && (
-                    <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        Year
-                      </span>
-                      <span className="text-sm">{project.academicYear}</span>
+                    <div className="flex items-center gap-3 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full">
+                      <Calendar className="h-5 w-5 text-green-600" />
+                      <span className="font-semibold">{project.academicYear}</span>
                     </div>
                   )}
-                  {project.categories && project.categories.length > 0 && (
-                    <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-2">
-                        <Tag className="h-4 w-4" />
-                        Categories
-                      </span>
-                      <span className="flex flex-wrap gap-1">
-                        {project.categories.map((cat, i) => (
-                          <Badge key={i} className="bg-blue-100 text-blue-800 border-blue-200">{cat}</Badge>
-                        ))}
+                  {Array.isArray(project.contributors) && (
+                    <div className="flex items-center gap-3 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full">
+                      <Users className="h-5 w-5 text-purple-600" />
+                      <span className="font-semibold">
+                        {project.contributors.length} contributor{project.contributors.length !== 1 ? "s" : ""}
                       </span>
                     </div>
                   )}
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Contributors */}
-            {Array.isArray(project.contributors) && project.contributors.length > 0 && (
-              <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-                <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50">
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-green-600" />
-                    Contributors
-                    <Badge variant="secondary" className="ml-auto">
-                      {project.contributors.length}
-                    </Badge>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="space-y-3">
-                    {project.contributors.map((contributor, i) => (
-                      <div
-                        key={i}
-                        className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-slate-50 to-slate-100 hover:from-slate-100 hover:to-slate-200 transition-all"
-                      >
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center text-white font-semibold">
-                          {(contributor.name || contributor.email || "C").charAt(0).toUpperCase()}
+                {/* Action Buttons */}
+                <div className="flex flex-wrap gap-4 mb-4">
+                  {project.sourceCodeUrl && (
+                    <Button size="lg" className="bg-gradient-to-r from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                      <Code className="h-5 w-5 mr-3" />
+                      View Source Code
+                      <ExternalLink className="h-5 w-5 ml-3" />
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="px-8 py-3 rounded-xl border-2 hover:bg-white/80 backdrop-blur-sm transition-all duration-300 relative"
+                    onClick={handleShare}
+                    type="button"
+                  >
+                    <Share2 className="h-5 w-5 mr-3" />
+                    {copied ? "Copied!" : "Share Project"}
+                  </Button>
+                  {/* <Button variant="outline" size="lg" className="px-8 py-3 rounded-xl border-2 hover:bg-white/80 backdrop-blur-sm transition-all duration-300">
+                    <Download className="h-5 w-5 mr-3" />
+                    Download
+                  </Button> */}
+                </div>
+              </div>
+              {/* Contributors and Tags side by side */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Contributors */}
+                {Array.isArray(project.contributors) && project.contributors.length > 0 && (
+                  <Card className="shadow-xl rounded-2xl border-0 bg-white/80 backdrop-blur-sm overflow-hidden">
+                    <CardHeader className="bg-gradient-to-r from-blue-50 to-cyan-50">
+                      <CardTitle className="flex items-center gap-3 text-xl font-bold">
+                        <div className="p-2 bg-blue-100 rounded-lg">
+                          <Users className="h-6 w-6 text-blue-600" />
                         </div>
-                        <div>
-                          <p className="font-medium text-slate-900">
-                            {contributor.name || contributor.email || "Contributor"}
-                          </p>
-                          {contributor.role && <p className="text-xs text-slate-600">{contributor.role}</p>}
+                        Contributors
+                        <Badge variant="secondary" className="ml-auto bg-blue-100 text-blue-700 font-semibold">
+                          {project.contributors.length}
+                        </Badge>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6 space-y-4">
+                      {project.contributors.map((contributor, i) => (
+                        <div
+                          key={i}
+                          className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-gray-50 to-blue-50 hover:from-blue-50 hover:to-indigo-50 transition-all duration-300 border border-gray-100 hover:border-blue-200"
+                        >
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                            {(contributor.name || contributor.email || "C").charAt(0).toUpperCase()}
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-semibold text-gray-900 text-lg">
+                              {contributor.name || contributor.email || "Contributor"}
+                            </p>
+                            {contributor.role && <p className="text-sm text-gray-600 font-medium">{contributor.role}</p>}
+                          </div>
                         </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
+                {/* Tags */}
+                {Array.isArray(project.tags) && project.tags.length > 0 && (
+                  <Card className="shadow-xl rounded-2xl border-0 bg-white/80 backdrop-blur-sm overflow-hidden">
+                    <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50">
+                      <CardTitle className="flex items-center gap-3 text-xl font-bold">
+                        <div className="p-2 bg-purple-100 rounded-lg">
+                          <Star className="h-6 w-6 text-purple-600" />
+                        </div>
+                        Tags
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <div className="flex flex-wrap gap-3">
+                        {project.tags.map((tag, i) => (
+                          <Badge
+                            key={i}
+                            variant="outline"
+                            className="bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 border-purple-200 hover:from-purple-100 hover:to-pink-100 transition-all duration-300 font-semibold px-4 py-2 rounded-full"
+                          >
+                            #{tag}
+                          </Badge>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+              {/* Description */}
+              {project.description && (
+                <Card className="shadow-xl rounded-2xl border-0 bg-white/80 backdrop-blur-sm overflow-hidden">
+                  <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50">
+                    <CardTitle className="flex items-center gap-3 text-xl font-bold">
+                      <div className="p-2 bg-green-100 rounded-lg">
+                        <FileText className="h-6 w-6 text-green-600" />
+                      </div>
+                      Description
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-8">
+                    <p className="text-gray-700 leading-relaxed text-lg">{project.description}</p>
+                  </CardContent>
+                </Card>
+              )}
+              {/* Abstract */}
+              {project.abstract && (
+                <Card className="shadow-xl rounded-2xl border-0 bg-white/80 backdrop-blur-sm overflow-hidden">
+                  <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50">
+                    <CardTitle className="flex items-center gap-3 text-xl font-bold">
+                      <div className="p-2 bg-purple-100 rounded-lg">
+                        <Star className="h-6 w-6 text-purple-600" />
+                      </div>
+                      Abstract
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-8">
+                    <p className="text-gray-700 leading-relaxed text-lg">{project.abstract}</p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+            {/* Sidebar */}
+            <div className="space-y-8">
+              {/* Project Overview */}
+              <Card className="bg-white/80 backdrop-blur-sm border-white/20 shadow-2xl rounded-2xl overflow-hidden">
+                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
+                  <h3 className="font-bold text-xl mb-2">Project Overview</h3>
+                  <p className="text-blue-100">Key information about this project</p>
+                </div>
+                <CardContent className="p-6 space-y-4">
+                  {project.creator && (
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+                      <span className="text-gray-600 font-medium">Creator</span>
+                      <span className="font-semibold text-gray-900">
+                        {project.creator.name || project.creator.email || "Unknown"}
+                      </span>
+                    </div>
+                  )}
+                  {project.department && (
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+                      <span className="text-gray-600 font-medium">Department</span>
+                      <span className="font-semibold text-gray-900">{project.department}</span>
+                    </div>
+                  )}
+                  {project.academicYear && (
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+                      <span className="text-gray-600 font-medium">Academic Year</span>
+                      <span className="font-semibold text-gray-900">{project.academicYear}</span>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
-            )}
-
-            {/* Technologies */}
-            {Array.isArray(project.technologiesUsed) && project.technologiesUsed.length > 0 && (
-              <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-                <CardHeader className="bg-gradient-to-r from-blue-50 to-cyan-50">
-                  <CardTitle className="flex items-center gap-2">
-                    <Code className="h-5 w-5 text-blue-600" />
-                    Technologies
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="flex flex-wrap gap-2">
-                    {project.technologiesUsed.map((tech, i) => (
-                      <Badge
-                        key={i}
-                        className="bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 border-blue-200 hover:from-blue-200 hover:to-cyan-200 transition-all"
-                      >
-                        {tech}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Tags */}
-            {Array.isArray(project.tags) && project.tags.length > 0 && (
-              <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-                <CardHeader className="bg-gradient-to-r from-amber-50 to-orange-50">
-                  <CardTitle className="flex items-center gap-2">
-                    <Tag className="h-5 w-5 text-amber-600" />
-                    Tags
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="flex flex-wrap gap-2">
-                    {project.tags.map((tag, i) => (
-                      <Badge
-                        key={i}
-                        variant="outline"
-                        className="bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200 text-amber-800 hover:bg-gradient-to-r hover:from-amber-100 hover:to-orange-100 transition-all"
-                      >
-                        #{tag}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+              {/* Technologies */}
+              {Array.isArray(project.technologiesUsed) && project.technologiesUsed.length > 0 && (
+                <Card className="shadow-xl rounded-2xl border-0 bg-white/80 backdrop-blur-sm overflow-hidden">
+                  <CardHeader className="bg-gradient-to-r from-orange-50 to-red-50">
+                    <CardTitle className="flex items-center gap-3 text-xl font-bold">
+                      <div className="p-2 bg-orange-100 rounded-lg">
+                        <Code className="h-6 w-6 text-orange-600" />
+                      </div>
+                      Technologies
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="flex flex-wrap gap-3">
+                      {project.technologiesUsed.map((tech, i) => (
+                        <Badge
+                          key={i}
+                          variant="secondary"
+                          className="bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border-blue-200 hover:from-blue-100 hover:to-indigo-100 transition-all duration-300 font-semibold px-4 py-2 rounded-full"
+                        >
+                          {tech}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+              {/* Categories */}
+              {project.categories && project.categories.length > 0 && (
+                <Card className="shadow-xl rounded-2xl border-0 bg-white/80 backdrop-blur-sm overflow-hidden">
+                  <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50">
+                    <CardTitle className="flex items-center gap-3 text-xl font-bold">
+                      <div className="p-2 bg-green-100 rounded-lg">
+                        <Globe className="h-6 w-6 text-green-600" />
+                      </div>
+                      Categories
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="flex flex-wrap gap-3">
+                      {project.categories.map((cat, i) => (
+                        <Badge
+                          key={i}
+                          variant="outline"
+                          className="bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 border-green-200 hover:from-green-100 hover:to-emerald-100 transition-all duration-300 font-semibold px-4 py-2 rounded-full"
+                        >
+                          {cat}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           </div>
         </div>
       </div>

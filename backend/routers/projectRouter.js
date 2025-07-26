@@ -122,12 +122,44 @@ router.get('/stats', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch stats' });
   }
 });
-
-// update
+//update
 router.put('/update/:id',(req,res)=>{
     Model.findByIdAndUpdate(req.params.id, req.body, { new: true })
     .then((result) => {
         res.status(200).json(result);
+    }).catch((err) => {
+        res.status(500).json(err);
+    });
+});
+
+// update
+router.put('/updatest/:id',(req,res)=>{
+    // Remove isApproved from the request body to prevent users from updating it
+    const { isApproved, ...updateData } = req.body;
+    
+    // First find the project to check if user is authorized
+    Model.findById(req.params.id)
+      .populate('creator', 'name email')
+    .then((project) => {
+        if (!project) {
+            return res.status(404).json({ message: 'Project not found' });
+        }
+        
+        // Check if the user is the creator (you might want to add user authentication middleware)
+        // For now, we'll rely on frontend validation, but you can add user ID check here
+        // if (project.creator._id.toString() !== req.user.id) {
+        //     return res.status(403).json({ message: 'Not authorized to update this project' });
+        // }
+        
+        // Update the project
+        return Model.findByIdAndUpdate(req.params.id, updateData, { new: true })
+          .populate('contributors')
+          .populate('creator', 'name email');
+    })
+    .then((result) => {
+        if (result) {
+            res.status(200).json(result);
+        }
     }).catch((err) => {
         res.status(500).json(err);
         console.log(err);
